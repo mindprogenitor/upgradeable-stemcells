@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# print input
+payload=$(cat <&0)
+echo "payload: $payload" >&2
+
+# extract parameters
+OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_IP_ADDRESS")
+OPS_MGR_USR=$(echo $payload | jq -r ".source.OPS_MGR_USR")
+OPS_MGR_PWD=$(echo $payload | jq -r ".source.OPS_MGR_PWD")
+IAAS=$(echo $payload | jq -r ".source.IAAS")
+PIVNET_TOKEN=$(echo $payload | jq -r ".source.PIVNET_TOKEN")
+EXCLUDE_TILE_LIST=$(echo $payload | jq -r ".source.EXCLUDE_TILE_LIST")
+CURRENT_VERSION=$(echo $payload | jq -r ".version")
+
+# Get current opsman Versions
+diagnostic_report=$(
+    om-linux \
+      -t https://$OPSMAN_IP_ADDRESS \
+      -u $OPS_MGR_USR \
+      -p $OPS_MGR_PWD \
+      -k \
+      curl --silent --path "/api/v0/diagnostic_report"
+  )
+
+if [[ -z "$EXCLUDE_TILE_LIST" ]]; then
+    EXCLUDE_TILE_LIST=[]
+fi
+
+current_versions=$( echo $diagnostic_report |
+    jq --arg exceptions $EXCLUDE_TILE_LIST \
+       --arg iaas $IAAS \
+       -r \
+       '[
+          .added_products.deployed[] 
+        | select (.name | inside($exceptions) | not) 
+        | .stemcell 
+        | capture("bosh-stemcell-(?<major>[0-9]{4,5}).(?<minor>[0-9]{1,4})-" + $iaas + "-hyperv-ubuntu-trusty-go_agent.tgz")  
+        | { version: (.major + "." + .minor), major: .major, minor: .minor} ] 
+        | unique'
+  )
+
+echo "current releases : $current_versions"
+
+releases=$(curl -s -H "Authorization: Token token=\"$PIVNET_TOKEN\"" https://network.pivotal.io/api/v2/products/stemcells/releases) 
+new_releases=$(
+echo $releases | jq --argjson current "$current_versions" \
+   '
+   { versions : [ .releases[].version 
+   | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})") 
+   | select( .major 
+           | inside($current | .[].major) )
+   | select( .major as $major 
+           | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
+           )
+   | {version: (.major + "." + .minor), major : .major, minor:.minor}] }')
+
+echo "releases : $new_releases" >&2
+
+versions="["
+if [[ $CURRENT_VERSION != "null" ]]; then
+    versions="[$CURRENT_VERSION,"
+fi
+versions="$versions$new_releases]"
+
+echo $versions
+
