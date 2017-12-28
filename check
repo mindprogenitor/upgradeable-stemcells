@@ -16,13 +16,22 @@ echo "payload: $payload"
 echo "First Parameter is $1"
 
 # extract parameters
-OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_IP_ADDRESS")
-OPS_MGR_USR=$(echo $payload | jq -r ".source.OPS_MGR_USR")
-OPS_MGR_PWD=$(echo $payload | jq -r ".source.OPS_MGR_PWD")
+OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_ADDRESS")
+OPS_MGR_USR=$(echo $payload | jq -r ".source.OPSMAN_USERNAME")
+OPS_MGR_PWD=$(echo $payload | jq -r ".source.OPSMAN_PASSWORD")
 IAAS=$(echo $payload | jq -r ".source.IAAS")
 PIVNET_TOKEN=$(echo $payload | jq -r ".source.PIVNET_TOKEN")
 EXCLUDE_TILE_LIST=$(echo $payload | jq -r ".source.EXCLUDE_TILE_LIST")
 CURRENT_VERSION=$(echo $payload | jq -r ".version")
+
+echo "OPSMAN_IP_ADDRESS : $OPSMAN_IP_ADDRESS"
+echo "OPS_MGR_USR : $OPS_MGR_USR"
+echo "OPS_MGR_PWD : $OPS_MGR_PWD"
+echo "IAAS : $IAAS"
+echo "PIVNET_TOKEN : $PIVNET_TOKEN"
+echo "EXCLUDE_TILE_LIST : $EXCLUDE_TILE_LIST"
+echo "CURRENT_VERSION : $CURRENT_VERSION"
+
 
 # Get current opsman Versions
 diagnostic_report=$(
