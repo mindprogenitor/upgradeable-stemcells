@@ -1,4 +1,4 @@
-FROM base-pcf
+FROM mindprogeny/base-pcf
 
 ADD check /opt/resource/check
 ADD in /opt/resource/in
