@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
+set -e
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+# save payload in tmp for later inspection
+cat > /tmp/payload <&0
+
 # print input
-payload=$(cat <&0)
-echo "payload: $payload" >&2
+payload=$(cat /tmp/payload)
+echo "payload: $payload"
+
+# print first parameter
+echo "First Parameter is $1"
 
 # extract parameters
 OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_IP_ADDRESS")
@@ -55,7 +66,7 @@ echo $releases | jq --argjson current "$current_versions" \
            )
    | {version: (.major + "." + .minor), major : .major, minor:.minor}] }')
 
-echo "releases : $new_releases" >&2
+echo "releases : $new_releases"
 
 versions="["
 if [[ $CURRENT_VERSION != "null" ]]; then
@@ -63,5 +74,5 @@ if [[ $CURRENT_VERSION != "null" ]]; then
 fi
 versions="$versions$new_releases]"
 
-echo $versions
+echo $versions >&3
 
