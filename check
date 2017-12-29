@@ -80,7 +80,7 @@ echo $releases | jq --argjson current "$current_versions"    '
    | select( .major
            | inside($current | .[].major) )
    | select( .major as $major
-           | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
+           | (.minor | tonumber) >= ($current[] | select(.major == $major) | .minor | tonumber)
            )
    | (.major + "." + .minor)]' | jq -R '{version : . }')
 
