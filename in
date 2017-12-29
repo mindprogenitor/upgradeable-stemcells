@@ -10,10 +10,6 @@ cat > /tmp/payload <&0
 
 # print input
 payload=$(cat /tmp/payload)
-echo "payload: $payload"
-
-# print first parameter
-echo "First Parameter is $1"
 
 # extract parameters
 OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_ADDRESS")
@@ -28,16 +24,12 @@ echo "OPSMAN_IP_ADDRESS : $OPSMAN_IP_ADDRESS"
 echo "OPS_MGR_USR : $OPS_MGR_USR"
 echo "IAAS : $IAAS"
 echo "EXCLUDE_TILE_LIST : $EXCLUDE_TILE_LIST"
-echo "VERSION : $CURRENT_VERSION"
+echo "VERSION : $VERSION"
 
 
 #Login into pivnet
 pivnet-cli login --api-token="$PIVNET_TOKEN"
 
-versions="["
-if [[ $CURRENT_VERSION != "null" ]]; then
-    versions="\"[$CURRENT_VERSION,"
-fi
-versions="$versions$new_releases]"
-
-echo '{\"version\" : $VERSION, \"metadata\" : [] }' >&3
+result='{\"version\" : $VERSION, \"metadata\" : [] }'
+echo $result
+echo $result >&3
