@@ -63,17 +63,28 @@ current_versions=$( echo $diagnostic_report |
 echo "current releases : $current_versions"
 
 releases=$(curl -s -H "Authorization: Token token=\"$PIVNET_TOKEN\"" https://network.pivotal.io/api/v2/products/stemcells/releases) 
+#new_releases=$(
+#echo $releases | jq --argjson current "$current_versions" \
+#   '
+#   { versions : \"[ .releases[].version 
+#   | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})") 
+#   | select( .major 
+#           | inside($current | .[].major) )
+#   | select( .major as $major 
+#           | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
+#           )
+#   | {version: (.major + "." + .minor), major : .major, minor:.minor}]\" }')
+
 new_releases=$(
-echo $releases | jq --argjson current "$current_versions" \
-   '
-   { versions : \"[ .releases[].version 
-   | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})") 
-   | select( .major 
+echo $releases | jq --argjson current "$current_versions"    '
+   [ .releases[].version
+   | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})")
+   | select( .major
            | inside($current | .[].major) )
-   | select( .major as $major 
+   | select( .major as $major
            | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
            )
-   | {version: (.major + "." + .minor), major : .major, minor:.minor}]\" }')
+   | (.major + "." + .minor)]' | jq -R '{version : . }')
 
 echo "releases : $new_releases"
 
