@@ -83,5 +83,5 @@ if [[ $CURRENT_VERSION != "null" ]]; then
 fi
 versions="$versions$new_releases]"
 
-echo $versions >&3
+echo $versions
 
