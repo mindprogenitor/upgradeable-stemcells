@@ -79,10 +79,8 @@ echo "releases : $new_releases"
 
 versions="["
 if [[ $CURRENT_VERSION != "null" ]]; then
-    versions="[$CURRENT_VERSION,"
+    versions="[\"$CURRENT_VERSION,"
 fi
-versions="$versions$new_releases]"
+versions="$versions$new_releases]\""
 
-echo $versions
-
-echo "[{ \"version\" : \"\" }]" >&3
+echo $versions >&3
