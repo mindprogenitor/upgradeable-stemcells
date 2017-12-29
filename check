@@ -85,4 +85,4 @@ versions="$versions$new_releases]"
 
 echo $versions
 
-echo "[{ \"version\" : [] }]" >&3
+echo "[{ \"version\" : \"\" }]" >&3
