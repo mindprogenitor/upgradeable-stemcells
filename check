@@ -85,3 +85,4 @@ versions="$versions$new_releases]"
 
 echo $versions
 
+echo "{ version : { test : 0 } }" >&3
