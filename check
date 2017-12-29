@@ -66,21 +66,21 @@ releases=$(curl -s -H "Authorization: Token token=\"$PIVNET_TOKEN\"" https://net
 new_releases=$(
 echo $releases | jq --argjson current "$current_versions" \
    '
-   { versions : [ .releases[].version 
+   { versions : \"[ .releases[].version 
    | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})") 
    | select( .major 
            | inside($current | .[].major) )
    | select( .major as $major 
            | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
            )
-   | {version: (.major + "." + .minor), major : .major, minor:.minor}] }')
+   | {version: (.major + "." + .minor), major : .major, minor:.minor}]\" }')
 
 echo "releases : $new_releases"
 
-versions="\"["
+versions="["
 if [[ $CURRENT_VERSION != "null" ]]; then
     versions="\"[$CURRENT_VERSION,"
 fi
-versions="$versions$new_releases]\""
+versions="$versions$new_releases]"
 
 echo $versions >&3
