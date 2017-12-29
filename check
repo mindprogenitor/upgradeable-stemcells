@@ -77,9 +77,9 @@ echo $releases | jq --argjson current "$current_versions" \
 
 echo "releases : $new_releases"
 
-versions="["
+versions="\"["
 if [[ $CURRENT_VERSION != "null" ]]; then
-    versions="[\"$CURRENT_VERSION,"
+    versions="\"[$CURRENT_VERSION,"
 fi
 versions="$versions$new_releases]\""
 
