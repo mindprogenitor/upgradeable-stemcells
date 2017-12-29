@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+# save payload in tmp for later inspection
+cat > /tmp/payload <&0
+
+# print input
+payload=$(cat /tmp/payload)
+echo "payload: $payload"
+
+# print first parameter
+echo "First Parameter is $1"
+
+# extract parameters
+OPSMAN_IP_ADDRESS=$(echo $payload | jq -r ".source.OPSMAN_ADDRESS")
+OPS_MGR_USR=$(echo $payload | jq -r ".source.OPSMAN_USERNAME")
+OPS_MGR_PWD=$(echo $payload | jq -r ".source.OPSMAN_PASSWORD")
+IAAS=$(echo $payload | jq -r ".source.IAAS")
+PIVNET_TOKEN=$(echo $payload | jq -r ".source.PIVNET_TOKEN")
+EXCLUDE_TILE_LIST=$(echo $payload | jq -r ".source.EXCLUDE_TILE_LIST")
+VERSION=$(echo $payload | jq -r ".version")
+
+echo "OPSMAN_IP_ADDRESS : $OPSMAN_IP_ADDRESS"
+echo "OPS_MGR_USR : $OPS_MGR_USR"
+echo "IAAS : $IAAS"
+echo "EXCLUDE_TILE_LIST : $EXCLUDE_TILE_LIST"
+echo "VERSION : $CURRENT_VERSION"
+
+
+#Login into pivnet
+pivnet-cli login --api-token="$PIVNET_TOKEN"
+
+versions="["
+if [[ $CURRENT_VERSION != "null" ]]; then
+    versions="\"[$CURRENT_VERSION,"
+fi
+versions="$versions$new_releases]"
+
+echo '{\"version\" : $VERSION, \"metadata\" : [] }' >&3
