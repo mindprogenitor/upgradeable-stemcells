@@ -30,6 +30,8 @@ echo "VERSION : $VERSION"
 #Login into pivnet
 pivnet-cli login --api-token="$PIVNET_TOKEN"
 
+
+
 result="{\"version\" : $VERSION, \"metadata\" : [] }"
 echo $result
-echo $result >&3
+#echo $result >&3
