@@ -74,7 +74,7 @@ releases=$(curl -s -H "Authorization: Token token=\"$PIVNET_TOKEN\"" https://net
 #   | {version: (.major + "." + .minor), major : .major, minor:.minor}]\" }')
 
 new_releases=$(
-echo $releases | jq --argjson current "$current_versions"    '
+echo $releases | jq -c -r --argjson current "$current_versions"    '
    [ .releases[].version
    | capture("(?<major>[0-9]{4,5})\\.(?<minor>[0-9]{1,5})")
    | select( .major
@@ -82,7 +82,7 @@ echo $releases | jq --argjson current "$current_versions"    '
    | select( .major as $major
            | (.minor | tonumber) >= ($current[] | select(.major == $major) | .minor | tonumber)
            )
-   | (.major + "." + .minor)]' | jq -R '{version : . }')
+   | (.major + "." + .minor)]' | jq -R -c '{version : . }')
 
 echo "releases : $new_releases"
 
@@ -92,5 +92,5 @@ if [[ $CURRENT_VERSION != "null" ]]; then
 fi
 versions="$versions$new_releases]"
 
-echo $versions
-#echo "[ $new_releases ]" >&3
+echo "VERSIONS ARE: $versions"
+echo "[ $new_releases ]" >&3
