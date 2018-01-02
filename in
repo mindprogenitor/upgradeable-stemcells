@@ -33,11 +33,11 @@ pivnet-cli login --api-token="$PIVNET_TOKEN"
 # for each version check if it exists, or download it
 echo "Checking if the versions require a new download"
 for version in $(echo $VERSION | jq -r ".version" | jq -r '.[]'); do
-    echo "check ./bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz"
-    if ls ./bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz 1> /dev/null 2>&1; then
+    echo "check $1/bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz"
+    if ls $1/bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz 1> /dev/null 2>&1; then
         echo "Stemcel $version is already downloaded"
     else
-        pivnet-cli download-product-files -p stemcells -r $version -g "*$IAAS*" --accept-eula
+        pivnet-cli download-product-files -p stemcells -r $version -g "*$IAAS*" --accept-eula -d $1
     fi
 done
 
