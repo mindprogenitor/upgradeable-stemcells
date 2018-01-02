@@ -28,11 +28,11 @@ echo "VERSION : $VERSION"
 
 
 #Login into pivnet
-pivnet-cli login --api-token="$PIVNET_TOKEN"
+pivnet login --api-token="$PIVNET_TOKEN"
 
 # for each version check if it exists, or download it
 echo "Checking if the versions require a new download"
-for version in $(echo $version | jq -r ".version" | jq -r '.[]'); do
+for version in $(echo $VERSION | jq -r ".version" | jq -r '.[]'); do
     echo "check ./bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz"
     if ls ./bosh-stemcell-$version-$IAAS-hyperv-ubuntu-trusty-go_agent.tgz 1> /dev/null 2>&1; then
         echo "Stemcel $version is already downloaded"
