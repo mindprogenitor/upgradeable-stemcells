@@ -44,4 +44,4 @@ done
 
 result="{\"version\" : $VERSION, \"metadata\" : [] }"
 echo $result
-#echo $result >&3
+echo $result >&3
