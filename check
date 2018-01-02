@@ -93,4 +93,4 @@ fi
 versions="$versions$new_releases]"
 
 echo $versions
-#echo "[$new_releases]" >&3
+#echo "[ $new_releases ]" >&3
