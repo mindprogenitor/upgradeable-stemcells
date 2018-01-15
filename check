@@ -80,9 +80,9 @@ echo $releases | jq -c -r --argjson current "$current_versions"    '
    | select( .major
            | inside($current | .[].major) )
    | select( .major as $major
-           | (.minor | tonumber) >= ($current[] | select(.major == $major) | .minor | tonumber)
+           | (.minor | tonumber) > ($current[] | select(.major == $major) | .minor | tonumber)
            )
-   | (.major + "." + .minor)]' | jq -R -c '{versions : . }')
+   ] | group_by(.major) | [ .[] | max_by(.minor) | (.major + "." + .minor) ]' | jq -R -c '{versions : . }')
 
 echo "releases : $new_releases"
 
@@ -92,5 +92,6 @@ if [[ $CURRENT_VERSION != "null" ]]; then
 fi
 versions="$versions$new_releases]"
 
-echo "VERSIONS ARE: $versions"
-echo "[ $new_releases ]" >&3
+#echo "VERSIONS ARE: $versions"
+#echo "[ $new_releases ]" >&3
+echo $versions >&3
